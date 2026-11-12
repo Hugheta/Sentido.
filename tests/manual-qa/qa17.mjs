@@ -1,0 +1,15 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const errors=[]; page.on('pageerror',e=>errors.push(String(e)));
+const body = () => page.locator('body').innerText();
+const pos = () => page.evaluate(() => { const e=window.__sentido; return {x:e.gx,y:e.gy,a:Math.round(e.angle*100)/100,coll:e.collisions}; });
+const press = async (seq) => { for (const [k,n] of seq) for (let i=0;i<n;i++){ await page.keyboard.press(k); await page.waitForTimeout(330); } };
+await page.goto('http://localhost:4186', { waitUntil: 'networkidle' });
+await page.getByRole('button', { name: 'jogar', exact: true }).nth(2).click();
+await page.getByRole('button', { name: /Começar a fase/i }).click(); await page.waitForTimeout(350);
+await press([['ArrowUp',4],['d',1],['ArrowUp',2],['a',1],['ArrowUp',5],['a',1],['ArrowUp',2],['d',1],['ArrowUp',10]]);
+await page.waitForTimeout(700);
+console.log('fase3', await pos(), /fase 03 concluída/i.test(await body()));
+await page.screenshot({path:'/tmp/j3.png'});
+await browser.close();

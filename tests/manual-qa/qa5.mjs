@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const browser = await chromium.launch();
+const m = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+await m.goto('http://localhost:4182', { waitUntil: 'networkidle' });
+await m.waitForTimeout(800);
+await m.evaluate(() => window.scrollTo(0, 300));
+await m.waitForTimeout(600);
+await m.screenshot({ path: '/tmp/t-menu-card.png' });
+await m.evaluate(() => window.scrollTo(0, 1100));
+await m.waitForTimeout(600);
+await m.screenshot({ path: '/tmp/t-menu-fases.png' });
+await m.getByRole('button', { name: /Começar a fase/i }).count().catch(()=>0);
+await browser.close();
